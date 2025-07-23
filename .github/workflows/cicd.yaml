@@ -27,12 +27,30 @@ jobs:
         with:
           push: true
           tags: aumthakkar/python-app:${{ env.COMMIT_ID }}
+    
+    outputs:
+      commit_id: ${{ env.COMMIT_ID }}
 
 
   cd:
     needs: ci
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v3 # This step clones our argocd synced github repo first before committing to our values.yaml file below
+      
+      - name: Update Image tag in argocd monitored values.yaml file
+        shell: bash
+        run: |
+          echo ${{needs.ci.outputs.commit_id }}
+          pip install yq
+          yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id }}"' /charts/python-app/values.yaml
+
+      
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'Updates charts/python-app/values.yaml with commit - ${{needs.ci.outputs.commit_id }}'
+
       - name: Install Argocd
         shell: bash
         run: |
@@ -47,7 +65,6 @@ jobs:
           --insecure \
           --grpc-web \
           --username admin \
-          --password ${{ secrets.ARGOCD_PASSWORD }}
-          
+          --password ${{ secrets.ARGOCD_PASSWORD }}          
           argocd app sync python-app 
 

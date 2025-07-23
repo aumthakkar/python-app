@@ -37,13 +37,13 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3 # This step clones our argocd synced github repo first before committing to our values.yaml file below
-      
+
       - name: Update Image tag in argocd monitored values.yaml file
         shell: bash
         run: |
           echo ${{needs.ci.outputs.commit_id }}
           pip install yq
-          yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id }}"' /charts/python-app/values.yaml
+          yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id }}"' charts/python-app/values.yaml
 
       
       - name: Commit changes

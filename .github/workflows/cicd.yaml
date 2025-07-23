@@ -43,13 +43,13 @@ jobs:
         run: |
           echo ${{needs.ci.outputs.commit_id }}
           pip install yq
-          yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id }}"' charts/python-app/values.yaml
+          yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id}}"' charts/python-app/values.yaml
 
       
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:
-          message: 'Updates charts/python-app/values.yaml with commit - ${{needs.ci.outputs.commit_id }}'
+          message: 'Updates charts/python-app/values.yaml with commit ${{needs.ci.outputs.commit_id}}'
 
       - name: Install Argocd
         shell: bash

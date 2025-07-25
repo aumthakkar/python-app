@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3 # This step clones our argocd synced github repo first before committing to our values.yaml file below
 
-      - name: Update Image tag in argocd monitored values.yaml file
+      - name: Update Image tag in argocd monitored charts/python-app/values.yaml file
         shell: bash
         run: |
           echo ${{needs.ci.outputs.commit_id }}
@@ -49,9 +49,9 @@ jobs:
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:
-          message: 'Updates charts/python-app/values.yaml with commit ${{needs.ci.outputs.commit_id}}'
+          message: 'Updates charts/python-app/values.yaml with latest docker image push commit ${{needs.ci.outputs.commit_id}}'
 
-      - name: Install Argocd
+      - name: Install Argocd # To run the argocd app sync <application> argocd CLI 
         shell: bash
         run: |
           curl -ksSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -61,10 +61,12 @@ jobs:
       - name: Argocd app sync
         shell: bash
         run: |
+        
           argocd login argocd-server.argocd \
           --insecure \
           --grpc-web \
           --username admin \
-          --password ${{ secrets.ARGOCD_PASSWORD }}          
+          --password ${{ secrets.ARGOCD_PASSWORD }}  
+
           argocd app sync python-app 
 

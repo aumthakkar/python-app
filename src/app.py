@@ -16,7 +16,7 @@ def info():
     return jsonify({
         'time' : time.ctime(),
         'hostname' : socket.gethostname(),
-        'message' : 'You are doing great, human! <3',
+        'message' : 'You are doing great, Pranav! <3',
         'deployed_on' : 'kubernetes'
     })
 

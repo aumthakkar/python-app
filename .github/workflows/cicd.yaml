@@ -11,7 +11,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Shorten the commit id
+      - name: Shorten the commit id to first 6 characters
         shell: bash
         run: |
           echo "COMMIT_ID=${GITHUB_SHA::6}" >> "$GITHUB_ENV"
@@ -38,13 +38,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3 # This step clones our argocd synced github repo first before committing to our values.yaml file below
 
-      - name: Update Image tag in argocd monitored charts/python-app/values.yaml file
+      - name: Update Image tag in argocd monitored charts/python-app/values.yaml file on github
         shell: bash
         run: |
-          echo ${{needs.ci.outputs.commit_id }}
+          echo ${{ needs.ci.outputs.commit_id }}
           pip install yq
           yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id}}"' charts/python-app/values.yaml
-
       
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
@@ -60,8 +59,7 @@ jobs:
           
       - name: Argocd app sync
         shell: bash
-        run: |
-        
+        run: |        
           argocd login argocd-server.argocd \
           --insecure \
           --grpc-web \
